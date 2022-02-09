@@ -3,14 +3,12 @@ import random
 import string
 import unicodedata
 
-import requests
-
 
 class SMS_XML:
     def __init__(self, api_key):
         self.api_key = api_key
 
-    # https://docs.simpay.pl/#odbieranie-informacji-o-sms
+    # https://docs-new.simpay.pl/python/?python#smsxml-odbieranie-informacji-o-sms
     def check_parameters(self, request):
         for param in SMS_XML.PARAMS:
             if request.get(param) is None:
@@ -18,7 +16,7 @@ class SMS_XML:
 
         return request.get("sign") is not None and request.get("sign") == self.sign(request)
 
-    # https://docs.simpay.pl/#odbieranie-informacji-o-sms
+    # https://docs-new.simpay.pl/python/?python#smsxml-odbieranie-informacji-o-sms
     @staticmethod
     def generate_code():
         key = ''
@@ -28,14 +26,7 @@ class SMS_XML:
 
         return key
 
-    # https://docs.simpay.pl/#lista-ip-serwerow-simpay
-    @staticmethod
-    def get_servers_ip():
-        r = requests.get(SMS_XML.GET_IP_URL)
-
-        return r.json()
-
-    # https://docs.simpay.pl/#odbieranie-informacji-o-sms
+    # https://docs-new.simpay.pl/python/?python#smsxml-odbieranie-informacji-o-sms
     @staticmethod
     def generate_xml(code):
         header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><sms-response>"
@@ -56,7 +47,6 @@ class SMS_XML:
                            ).hexdigest()
 
 
-SMS_XML.GET_IP_URL = "https://simpay.pl/api/get_ip"
 SMS_XML.CODES = {
     "7055": 0.25,
     "7136": 0.5,
