@@ -113,7 +113,7 @@ class DirectBilling:
             data.amount,
             data.amountType,
             data.description,
-            data.contol
+            data.control
         ]
         
         if data.returns is not None:

@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='simpay-api',
-    version='2.0',
+    version='2.1',
     description='Python wrapper for Simpay API',
     author='Rafał Więcek <kontakt@simpay.pl>',
 
