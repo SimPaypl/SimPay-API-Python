@@ -8,7 +8,7 @@ setup(
     description='Python wrapper for Simpay API',
     author='Rafał Więcek <kontakt@simpay.pl>',
 
-    url='https://github.com/DreamProject-pro/simpay-python-lib',
+    url='https://github.com/SimPaypl/SimPay-API-Python',
 
     packages=['payments'],
     install_required=[
