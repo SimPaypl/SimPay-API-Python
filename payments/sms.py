@@ -13,7 +13,7 @@ class SMS:
             'X-SIM-PASSWORD': self.api_password
         }
 
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-listy-uslug
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-listy-uslug
     def get_service_list(self):
         result = []
 
@@ -43,13 +43,13 @@ class SMS:
 
         return r.json()
     
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-informacji-o-usludze
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-informacji-o-usludze
     def get_service(self, service_id):
         r = requests.get(self.url + '/' + service_id, headers=self.headers)
 
         return r.json().data
     
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-listy-transakcji
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-listy-transakcji
     def get_transaction_list(self, service_id):
         result = []
 
@@ -79,13 +79,13 @@ class SMS:
 
         return r.json()
     
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-informacji-o-transakcji
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-informacji-o-transakcji
     def get_transaction(self, service_id, transaction_id):
         r = requests.get(self.url + '/' + service_id + '/transactions/' + transaction_id, headers=self.headers)
 
         return r.json().data
 
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-dostepnych-numerow-dla-uslugi
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-dostepnych-numerow-dla-uslugi
     def get_service_numbers(self, service_id):
         result = []
 
@@ -115,13 +115,13 @@ class SMS:
 
         return r.json()
     
-    # https://docs-new.simpay.pl/python/?python#sms-informacji-o-pojedynczym-numerze-uslugi
+    # https://docs.simpay.pl/pl/python/?python#sms-informacji-o-pojedynczym-numerze-uslugi
     def get_service_number(self, service_id, number):
         r = requests.get(self.url + '/sms/' + service_id + '/numbers/' + number, headers=self.headers)
 
         return r.json().data
 
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-wszystkich-dostepnych-numerow
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-wszystkich-dostepnych-numerow
     def get_numbers(self):
         result = []
 
@@ -151,14 +151,14 @@ class SMS:
 
         return r.json()
     
-    # https://docs-new.simpay.pl/python/?python#sms-pobieranie-pojedynczego-numeru-sms
+    # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-pojedynczego-numeru-sms
 
     def get_number(self, number):
         r = requests.get(self.url + '/numbers/' + number, headers=self.headers)
 
         return r.json().data
 
-    # https://docs-new.simpay.pl/python/?python#sms-weryfikacja-poprawnosci-kodu
+    # https://docs.simpay.pl/pl/python/?python#sms-weryfikacja-poprawnosci-kodu
 
     def verify_sms_code(self, service_id, code, number=None):
         body = types.SimpleNamespace()

@@ -14,7 +14,7 @@ class DirectBilling:
             'X-SIM-PASSWORD': self.api_password
         }
 
-    # https://docs-new.simpay.pl/python/?python#directbilling-pobieranie-listy-uslug
+    # https://docs.simpay.pl/pl/python/?python#directbilling-pobieranie-listy-uslug
     def get_service_list(self):
         result = []
 
@@ -44,19 +44,19 @@ class DirectBilling:
 
         return r.json()
     
-    # https://docs-new.simpay.pl/python/?python#directbilling-pobieranie-informacji-o-usludze
+    # https://docs.simpay.pl/pl/python/?python#directbilling-pobieranie-informacji-o-usludze
     def get_service(self, service_id):
         r = requests.get(self.url + '/' + service_id, headers=self.headers)
 
         return r.json().data
     
-    # https://docs-new.simpay.pl/python/?python#directbilling-kalkulacja-prowizji
+    # https://docs.simpay.pl/pl/python/?python#directbilling-kalkulacja-prowizji
     def calculate_commission(self, service_id, amount):
         r = requests.get(self.url + '/' + service_id + '/calculate?amount=' + amount);
 
         return r.json().data
 
-    # https://docs-new.simpay.pl/python/?python#directbilling-pobieranie-listy-transakcji
+    # https://docs.simpay.pl/pl/python/?python#directbilling-pobieranie-listy-transakcji
     def get_transaction_list(self, service_id):
         result = []
 
@@ -86,13 +86,13 @@ class DirectBilling:
 
         return r.json()
     
-    # https://docs-new.simpay.pl/python/?python#directbilling-pobieranie-informacji-o-transakcji
+    # https://docs.simpay.pl/pl/python/?python#directbilling-pobieranie-informacji-o-transakcji
     def get_transaction(self, service_id, transaction_id):
         r = requests.get(self.url + '/' + service_id + '/transactions/' + transaction_id, headers=self.headers)
 
         return r.json().data
 
-    # https://docs-new.simpay.pl/python/?python#directbilling-generowanie-transakcji
+    # https://docs.simpay.pl/pl/python/?python#directbilling-generowanie-transakcji
     def create_transaction(self, service_id, key, request):
         request.signature = self.generate_signature(key, request)
 
@@ -100,14 +100,14 @@ class DirectBilling:
 
         return r.json().data
 
-    # https://docs-new.simpay.pl/python/?python#directbilling-generowanie-transakcji
+    # https://docs.simpay.pl/pl/python/?python#directbilling-generowanie-transakcji
     def check_notification(self, key, body):
         if body.signature is None:
             return False
         
         return body.signature == self.generate_signature(key, body)
 
-    # https://docs-new.simpay.pl/python/?python#directbilling-generowanie-transakcji
+    # https://docs.simpay.pl/pl/python/?python#directbilling-generowanie-transakcji
     def generate_signature(self, key, data):
         elements = [
             data.amount,

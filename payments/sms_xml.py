@@ -8,7 +8,7 @@ class SMS_XML:
     def __init__(self, api_key):
         self.api_key = api_key
 
-    # https://docs-new.simpay.pl/python/?python#smsxml-odbieranie-informacji-o-sms
+    # https://docs.simpay.pl/pl/python/?python#smsxml-odbieranie-informacji-o-sms
     def check_parameters(self, request):
         for param in SMS_XML.PARAMS:
             if request.get(param) is None:
@@ -16,7 +16,7 @@ class SMS_XML:
 
         return request.get("sign") is not None and request.get("sign") == self.sign(request)
 
-    # https://docs-new.simpay.pl/python/?python#smsxml-odbieranie-informacji-o-sms
+    # https://docs.simpay.pl/pl/python/?python#smsxml-odbieranie-informacji-o-sms
     @staticmethod
     def generate_code():
         key = ''
@@ -26,7 +26,7 @@ class SMS_XML:
 
         return key
 
-    # https://docs-new.simpay.pl/python/?python#smsxml-odbieranie-informacji-o-sms
+    # https://docs.simpay.pl/pl/python/?python#smsxml-odbieranie-informacji-o-sms
     @staticmethod
     def generate_xml(code):
         header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><sms-response>"
