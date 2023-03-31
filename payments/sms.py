@@ -10,7 +10,9 @@ class SMS:
         self.url = 'https://api.simpay.pl/sms'
         self.headers = {
             'X-SIM-KEY': self.api_key,
-            'X-SIM-PASSWORD': self.api_password
+            'X-SIM-PASSWORD': self.api_password,
+            'X-SIM-VERSION': '1.0',
+            'X-SIM-PLATFORM': 'PYTHON',
         }
 
     # https://docs.simpay.pl/pl/python/?python#sms-pobieranie-listy-uslug
