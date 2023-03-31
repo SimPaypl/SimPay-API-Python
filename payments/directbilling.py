@@ -12,7 +12,7 @@ class DirectBilling:
         self.headers = {
             'X-SIM-KEY': self.api_key,
             'X-SIM-PASSWORD': self.api_password,
-            'X-SIM-VERSION': '1.0',
+            'X-SIM-VERSION': '2.1.1',
             'X-SIM-PLATFORM': 'PYTHON',
         }
 
