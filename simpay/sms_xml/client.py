@@ -1,13 +1,16 @@
+from typing import TYPE_CHECKING
 import hashlib
 import random
 import string
 import unicodedata
 from simpay.sms_xml.models import PARAMS 
 
+if TYPE_CHECKING:
+    from simpay import Client
 
-class SMS_XML:
-    def __init__(self, api_key):
-        self.api_key = api_key
+class SMSXMLClient:
+    def __init__(self, client: 'Client') -> None:
+        self._client = client
 
     def check_parameters(self, request):
         for param in PARAMS:
@@ -38,6 +41,6 @@ class SMS_XML:
                                str(request.get("sms_from")) +
                                str(request.get("send_number")) +
                                str(request.get("send_time")) +
-                               str(self.api_key),
+                               str(self._client.api_key),
                                encoding="utf8")
                            ).hexdigest()

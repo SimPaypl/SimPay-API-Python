@@ -1,6 +1,7 @@
 from .__version__ import VERSION
 from simpay.baseModel import RequestMethod, Response
 from simpay.sms.client import SMSClient
+from simpay.sms_xml.client import SMSXMLClient
 from simpay.directbilling.client import DirectBillingClient
 import requests
 
@@ -42,6 +43,7 @@ class Client(object):
             self._http_client.headers['X-SIM-PASSWORD'] = self.api_password
 
         self.SMS: SMSClient = SMSClient(self)
+        self.SMS_XML: SMSXMLClient = SMSXMLClient(self)
         self.DirectBilling: DirectBillingClient = DirectBillingClient(self)
 
     def request(self, method: RequestMethod, uri: str, fields: dict[str, any] | None = None, headers: dict[str, any] | None = None, options: dict[str, any] | None = None) -> Response:
