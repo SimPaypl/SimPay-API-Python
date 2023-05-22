@@ -7,6 +7,8 @@ import requests
 
 
 class ClientException(Exception):
+    """Base exception of client requests"""
+
     def __init__(self, code=200, message=None, details=None):
         self.code = code
         self.message = message
@@ -17,6 +19,8 @@ class ClientException(Exception):
 
 
 class Client(object):
+    """Base client of SimPay"""
+
     _version = VERSION
     _user_agent = 'simpay-python-api'
     _base_endpoint = 'https://api.simpay.pl/'
@@ -27,6 +31,15 @@ class Client(object):
         api_password: str | None,
         timeout: int = 5
     ) -> None:
+        """Base client of SimPay
+
+        :param api_key: str
+            API key from account details
+        :param api_password: str
+            API password from account details
+        :param timeout: int
+            Timeout of HTTP request, default its 5 seconds
+        """
         self.api_key = api_key
         self.api_password = api_password
         self.timeout = timeout
@@ -42,11 +55,35 @@ class Client(object):
         if self.api_password is not None:
             self._http_client.headers['X-SIM-PASSWORD'] = self.api_password
 
+        """Instance of API interface SMS methods
+
+        :type: :class:`SMSClient <simpay.sms.client.SMSClient>`
+        """
         self.SMS: SMSClient = SMSClient(self)
+        """Instance of API interface SMS XML methods
+
+        :type: :class:`SMSXMLClient <simpay.sms_xml.client.SMSXMLClient>`
+        """
         self.SMS_XML: SMSXMLClient = SMSXMLClient(self)
+        """Instance of API interface DirectBilling methods
+        
+        :type: :class:`DirectBillingClient <simpay.directbilling.client.DirectBillingClient>`
+        """
         self.DirectBilling: DirectBillingClient = DirectBillingClient(self)
 
     def request(self, method: RequestMethod, uri: str, fields: dict[str, any] | None = None, headers: dict[str, any] | None = None, options: dict[str, any] | None = None) -> Response:
+        """Base client of SimPay
+
+        :param method: RequestMethod
+            HTTP request method (GET, POST, ...)
+        :param api_password: str
+            API password from account details
+        :param timeout: int
+            Timeout of HTTP request, default its 5 seconds
+
+        :return Response body
+        :rtype dict
+        """
         response = self._http_client.request(
             method.value, self._base_endpoint + uri, params=options, json=fields, headers=headers)
         if len(response.content) == 0:
