@@ -1,3 +1,4 @@
+from __future__ import annotations
 from .__version__ import VERSION
 from simpay.baseModel import RequestMethod, Response
 from simpay.sms.client import SMSClient
@@ -71,15 +72,19 @@ class Client(object):
         """
         self.DirectBilling: DirectBillingClient = DirectBillingClient(self)
 
-    def request(self, method: RequestMethod, uri: str, fields: dict[str, any] | None = None, headers: dict[str, any] | None = None, options: dict[str, any] | None = None) -> Response:
-        """Base client of SimPay
+    def request(self, method: RequestMethod, uri: str, fields: dict[str, any] | None = None, headers: dict[str, any] | None = None, options: dict[str, any] | None = None) -> dict:
+        """HTTP request builder
 
         :param method: RequestMethod
             HTTP request method (GET, POST, ...)
-        :param api_password: str
-            API password from account details
-        :param timeout: int
-            Timeout of HTTP request, default its 5 seconds
+        :param uri: str
+            API endpoint uri without base url
+        :param fields: dict[str, any]
+            HTTP POST fields (converted into JSON body content type)
+        :param headers: dict[str, any]
+            HTTP request headers
+        :param options: dict[str, any]
+            HTTP request builder options like pagination page, per page items
 
         :return Response body
         :rtype dict
@@ -96,7 +101,23 @@ class Client(object):
                 raise ClientException(response.status_code)
         return response.json()
 
-    def requestAllPages(self, method: RequestMethod, uri: str, fields: dict[str, any] | None = None, headers: dict[str, any] | None = None, options: dict[str, any] | None = None) -> object:
+    def requestAllPages(self, method: RequestMethod, uri: str, fields: dict[str, any] | None = None, headers: dict[str, any] | None = None, options: dict[str, any] | None = None) -> list:
+        """HTTP request builder with auto fetch pagination all pages
+
+        :param method: RequestMethod
+            HTTP request method (GET, POST, ...)
+        :param uri: str
+            API endpoint uri without base url
+        :param fields: dict[str, any]
+            HTTP POST fields (converted into JSON body content type)
+        :param headers: dict[str, any]
+            HTTP request headers
+        :param options: dict[str, any]
+            HTTP request builder options like pagination page, per page items
+
+        :return Response body items
+        :rtype list
+        """
         response = self.request(method, uri, fields, headers, options)
         responseData = []
         if response['success']:
