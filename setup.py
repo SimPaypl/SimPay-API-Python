@@ -6,7 +6,7 @@ setup(
     name='simpay-api',
     version='3.0',
     description='Python wrapper for Simpay API',
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     author='Rafał Więcek',
     author_email="kontakt@simpay.pl",
