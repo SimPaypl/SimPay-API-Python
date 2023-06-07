@@ -1,23 +1,24 @@
+from typing import TYPE_CHECKING
 import hashlib
 import random
 import string
 import unicodedata
+from simpay.sms_xml.models import PARAMS 
 
+if TYPE_CHECKING:
+    from simpay import Client
 
-class SMS_XML:
-    def __init__(self, api_key):
-        self.api_key = api_key
+class SMSXMLClient:
+    def __init__(self, client: 'Client') -> None:
+        self._client = client
 
-    # https://docs.simpay.pl/pl/python/?python#smsxml-odbieranie-informacji-o-sms
     def check_parameters(self, request):
-        for param in SMS_XML.PARAMS:
+        for param in PARAMS:
             if request.get(param) is None:
                 return False
 
         return request.get("sign") is not None and request.get("sign") == self.sign(request)
 
-    # https://docs.simpay.pl/pl/python/?python#smsxml-odbieranie-informacji-o-sms
-    @staticmethod
     def generate_code():
         key = ''
 
@@ -26,8 +27,6 @@ class SMS_XML:
 
         return key
 
-    # https://docs.simpay.pl/pl/python/?python#smsxml-odbieranie-informacji-o-sms
-    @staticmethod
     def generate_xml(code):
         header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><sms-response>"
         footer = "<sms-text></sms-text></sms-response>"
@@ -42,28 +41,6 @@ class SMS_XML:
                                str(request.get("sms_from")) +
                                str(request.get("send_number")) +
                                str(request.get("send_time")) +
-                               str(self.api_key),
+                               str(self._client.api_key),
                                encoding="utf8")
                            ).hexdigest()
-
-
-SMS_XML.CODES = {
-    "7055": 0.25,
-    "7136": 0.5,
-    "7255": 1.0,
-    "7355": 1.5,
-    "7455": 2.0,
-    "7555": 2.5,
-    "7636": 3.0,
-    "77464": 3.5,
-    "78464": 4.0,
-    "7936": 4.5,
-    "91055": 5.0,
-    "91155": 5.5,
-    "91455": 7.0,
-    "91664": 8.0,
-    "91955": 9.5,
-    "92055": 10.0,
-    "92555": 12.5
-}
-SMS_XML.PARAMS = ["send_number", "sms_text", "sms_from", "sms_id", "sign"]
