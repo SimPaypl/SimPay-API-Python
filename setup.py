@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='simpay-api',
-    version='3.0',
+    version='3.0.1',
     description='Python wrapper for Simpay API',
     long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
