@@ -4,7 +4,7 @@ import pytest
 import requests
 
 from simpay import Client, ClientException
-from simpay.directbilling.models import DCB_Amount_Type, DCB_Transaction_Returns, DCB_Transaction_Status
+from simpay.directbilling.models import DCB_Amount_Type, DCB_Service_Status, DCB_Transaction_Returns, DCB_Transaction_Status
 
 
 def make_response(status_code, body):
@@ -209,7 +209,7 @@ def test_get_transaction_parses_directbilling_transaction():
 
 def test_get_service_parses_operator_keys_and_numeric_commissions():
     client, _ = client_with(make_response(200, {'success': True, 'data': {
-        'id': 'svc', 'name': 'Sklep', 'suffix': 'SKLEP', 'status': 'service_db_active',
+        'id': 'svc', 'name': 'Sklep', 'suffix': 'SKLEP', 'status': 'service_active',
         'api': {'complete': 'https://shop.example/ok', 'failure': 'https://shop.example/fail'},
         'providers': {'t-mobile': True, 'orange': True, 'play': False, 'plus': True},
         'commissions': {
@@ -224,6 +224,7 @@ def test_get_service_parses_operator_keys_and_numeric_commissions():
 
     service = client.DirectBilling.get_service('svc')
 
+    assert service.status == DCB_Service_Status.ACTIVE
     assert service.providers.tmobile is True
     assert service.providers.play is False
     assert service.commissions.tmobile.commission_9 == '60'
@@ -280,3 +281,21 @@ def test_sms_xml_rejects_a_tampered_request():
     request['send_number'] = '92555'
 
     assert client.SMS_XML.check_parameters(request) is False
+
+
+def test_get_services_paginate_parses_list_items_with_every_status():
+    statuses = [
+        'service_active', 'service_db_new', 'service_db_blocked', 'service_db_deleted',
+        'service_db_second_verify', 'service_db_rejected', 'service_verify', 'service_db_ongoing_registration',
+    ]
+    client, _ = client_with(make_response(200, {'success': True, 'data': [
+        {'id': f'svc-{i}', 'name': 'Sklep', 'suffix': 'SKLEP', 'status': status, 'created_at': '2026-01-01T00:00:00+01:00'}
+        for i, status in enumerate(statuses)
+    ]}))
+
+    services = client.DirectBilling.get_services_paginate()
+
+    assert [service.status.value for service in services] == statuses
+    assert services[0].status == DCB_Service_Status.ACTIVE
+    assert services[2].status == DCB_Service_Status.BLOCKED
+    assert services[0].commissions is None
