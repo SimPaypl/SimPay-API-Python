@@ -1,7 +1,7 @@
 from __future__ import annotations
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class DCB_Service_Status(Enum):
@@ -45,14 +45,12 @@ class DCB_Service_Providers(BaseModel):
     :param plus: bool
         Prefix of SMS
     """
-    tmobile: bool
+    tmobile: bool = Field(alias='t-mobile')
     orange: bool
     play: bool
     plus: bool
 
-    class Config:
-        fields = {'tmobile': 't-mobile'}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DCB_Service_MaxValues(BaseModel):
@@ -67,14 +65,12 @@ class DCB_Service_MaxValues(BaseModel):
     :param plus: str
         Value for orange provider
     """
-    tmobile: str
-    orange: str
-    play: str
-    plus: str
+    tmobile: str | None = Field(default=None, alias='t-mobile')
+    orange: str | None = None
+    play: str | None = None
+    plus: str | None = None
 
-    class Config:
-        fields = {'tmobile': 't-mobile'}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True, coerce_numbers_to_str=True)
 
 
 class DCB_Service_Commission(BaseModel):
@@ -87,9 +83,11 @@ class DCB_Service_Commission(BaseModel):
     :param commission_25: str
         Commision rate from 25 PLN to max amount of transaction
     """
-    commission_0: str
-    commission_9: str
-    commission_25: str
+    commission_0: str | None = None
+    commission_9: str | None = None
+    commission_25: str | None = None
+
+    model_config = ConfigDict(coerce_numbers_to_str=True)
 
 
 class DCB_Service_Commissions(BaseModel):
@@ -104,14 +102,12 @@ class DCB_Service_Commissions(BaseModel):
     :param plus: DCB_Service_Commission
         Commision rate for plus provider
     """
-    tmobile: DCB_Service_Commission
+    tmobile: DCB_Service_Commission = Field(alias='t-mobile')
     orange: DCB_Service_Commission
     play: DCB_Service_Commission
     plus: DCB_Service_Commission
 
-    class Config:
-        fields = {'tmobile': 't-mobile'}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DCB_Service_Values(BaseModel):
@@ -126,7 +122,7 @@ class DCB_Service_Values(BaseModel):
     """
     net: float
     gross: float
-    partner: float | None
+    partner: float | None = None
 
 
 class DCB_Service_CalculatedCommissions(BaseModel):
@@ -141,14 +137,12 @@ class DCB_Service_CalculatedCommissions(BaseModel):
     :param plus: DCB_Service_Values | None
         Values for plus provider
     """
-    tmobile: DCB_Service_Values | None
-    orange: DCB_Service_Values | None
-    play: DCB_Service_Values | None
-    plus: DCB_Service_Values | None
+    tmobile: DCB_Service_Values | None = Field(default=None, alias='t-mobile')
+    orange: DCB_Service_Values | None = None
+    play: DCB_Service_Values | None = None
+    plus: DCB_Service_Values | None = None
 
-    class Config:
-        fields = {'tmobile': 't-mobile'}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DCB_Service_API(BaseModel):
@@ -159,8 +153,8 @@ class DCB_Service_API(BaseModel):
     :param failure: str
         Redirection url after failure transaction
     """
-    complete: str
-    failure: str
+    complete: str | None = None
+    failure: str | None = None
 
 
 class DCB_Service(BaseModel):
@@ -207,8 +201,8 @@ class DCB_Transaction_Notify(BaseModel):
         Count of notification attemps
     """
     is_send: bool
-    last_send_at: datetime
-    count: int
+    last_send_at: datetime | None = None
+    count: int | None = None
 
 
 class DCB_Transaction_Returns(BaseModel):
@@ -231,7 +225,7 @@ class DCB_Transaction(BaseModel):
     :param status: DCB_Transaction_Status
         Status
     :param phoneNumber: str | None
-        Phone number which transaction has been processed, original key from api it's number_from
+        Phone number which transaction has been processed
     :param control: str | None
         Own custom property
     :param value: float | None
@@ -255,22 +249,20 @@ class DCB_Transaction(BaseModel):
     """
     id: str
     status: DCB_Transaction_Status
-    phoneNumber: str | None
-    value: float | None
-    value_netto: float | None
-    values: DCB_Service_Values | None
-    operator: str | None
-    returns: DCB_Transaction_Returns | None
-    notify: DCB_Transaction_Notify | None
-    control: str | None
-    provider: int | None
-    signature: str | None
-    created_at: datetime | None
-    updated_at: datetime | None
+    phoneNumber: str | None = None
+    value: float | None = None
+    value_netto: float | None = Field(default=None, alias='value_net')
+    values: DCB_Service_Values | None = None
+    operator: str | None = None
+    returns: DCB_Transaction_Returns | None = None
+    notify: DCB_Transaction_Notify | None = None
+    control: str | None = None
+    provider: int | None = None
+    signature: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
-    class Config:
-        fields = {'phoneNumber': 'number_from'}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DCB_GeneratedTransaction(BaseModel):

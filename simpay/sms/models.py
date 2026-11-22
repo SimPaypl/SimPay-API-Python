@@ -1,7 +1,7 @@
 from __future__ import annotations
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SMS_Service_Status(Enum):
@@ -47,9 +47,9 @@ class SMS_Service(BaseModel):
     name: str
     prefix: str
     suffix: str
-    description: str | None
+    description: str | None = None
     adult: bool = False
-    numbers: list[int] | None
+    numbers: list[int] | None = None
     created_at: datetime
 
 
@@ -68,14 +68,12 @@ class SMS_Transaction(BaseModel):
         Sended at
     """
     id: str
-    from_number: int
+    from_number: int = Field(alias='from')
     code: str
     used: bool
     send_at: datetime
 
-    class Config:
-        fields = {'from_number': 'from'}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SMS_Number(BaseModel):
@@ -94,3 +92,32 @@ class SMS_Number(BaseModel):
     value: float
     value_gross: float
     adult: bool
+
+
+class SMS_Code(BaseModel):
+    """Result of SMS code verification
+
+    :param used: bool
+        Whether the code had already been used before this verification
+    :param code: str
+        SMS code
+    :param test: bool
+        Whether the code comes from a test SMS
+    :param from_number: str
+        Phone number the SMS was sent from, origin from api it's 'from'
+    :param number: int
+        Premium number the SMS was sent to
+    :param value: float
+        Net value of the number
+    :param used_at: datetime | None
+        When the code was used, only for codes that had already been used
+    """
+    used: bool
+    code: str
+    test: bool
+    from_number: str = Field(alias='from')
+    number: int
+    value: float
+    used_at: datetime | None = None
+
+    model_config = ConfigDict(populate_by_name=True)
