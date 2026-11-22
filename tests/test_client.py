@@ -134,7 +134,7 @@ def test_generate_transaction_sends_return_urls_as_success_and_failure():
     }
 
 
-# Response bodies below follow the resources and controllers in simpay-api.
+# Response bodies below follow the shape of real SimPay API responses.
 
 def test_verify_code_parses_an_unused_code():
     client, fake = client_with(make_response(200, {'success': True, 'data': {
