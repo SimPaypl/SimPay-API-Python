@@ -6,3 +6,4 @@ dist
 build
 *__pycache__
 simpay_api.egg-info
+.pytest_cache

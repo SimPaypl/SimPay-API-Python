@@ -16,5 +16,5 @@ setup(
     test_suite='tests',
     include_package_data=True,
     install_requires=['requests>=2.26.0', 'pydantic>=1.10.7'],
-    extras_require={'docs': ['sphinx>=7.0.1']},
+    extras_require={'docs': ['sphinx>=7.0.1'], 'test': ['pytest>=7']},
 )
