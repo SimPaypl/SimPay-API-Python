@@ -267,7 +267,7 @@ class DCB_Transaction(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, coerce_numbers_to_str=True)
 
 
 class DCB_GeneratedTransaction(BaseModel):

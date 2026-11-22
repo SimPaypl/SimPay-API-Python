@@ -185,7 +185,7 @@ def test_get_transaction_parses_directbilling_transaction():
     client, _ = client_with(make_response(200, {'success': True, 'data': {
         'id': 'tx-1',
         'status': 'transaction_db_payed',
-        'phoneNumber': '48123456789',
+        'phoneNumber': 48123456789,
         'control': 'order-15',
         'value': 12.3,
         'value_net': 10,
@@ -299,3 +299,30 @@ def test_get_services_paginate_parses_list_items_with_every_status():
     assert services[0].status == DCB_Service_Status.ACTIVE
     assert services[2].status == DCB_Service_Status.BLOCKED
     assert services[0].commissions is None
+
+
+def test_get_transactions_paginate_parses_sms_transactions():
+    client, _ = client_with(make_response(200, {'success': True, 'data': [
+        {'id': 123, 'from': 48500111222, 'code': 'ABC123', 'used': True, 'send_at': '2026-01-01T00:00:00+01:00'},
+        {'id': 124, 'from': 48500111333, 'code': None, 'used': False, 'send_at': '2026-01-01T00:00:00+01:00'},
+    ], 'pagination': {'total': 2, 'count': 2, 'per_page': 15, 'current_page': 1, 'total_pages': 1,
+                      'links': {'next_page': None, 'prev_page': None}}}))
+
+    transactions = client.SMS.get_transactions_paginate('svc')
+
+    assert [t.id for t in transactions] == ['123', '124']
+    assert transactions[0].from_number == 48500111222
+    assert transactions[1].code is None
+
+
+def test_get_transaction_parses_sms_transaction_details():
+    client, _ = client_with(make_response(200, {'success': True, 'data': {
+        'id': 125, 'from': 48500111222, 'code': 'ABC123', 'used': True,
+        'send_number': 7055, 'value': 0.5, 'send_at': '2026-01-01T00:00:00+01:00',
+    }}))
+
+    transaction = client.SMS.get_transaction('svc', 125)
+
+    assert transaction.id == '125'
+    assert transaction.send_number == 7055
+    assert transaction.value == 0.5
