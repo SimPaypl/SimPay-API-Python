@@ -185,7 +185,7 @@ def test_get_transaction_parses_directbilling_transaction():
     client, _ = client_with(make_response(200, {'success': True, 'data': {
         'id': 'tx-1',
         'status': 'transaction_db_payed',
-        'phoneNumber': '48123456789',
+        'phoneNumber': 48123456789,
         'control': 'order-15',
         'value': 12.3,
         'value_net': 10,
