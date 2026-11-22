@@ -124,9 +124,10 @@ class Client(object):
             responseData = responseData + response['data']
             while response['pagination']['links']['next_page']:
                 response = self.request(
-                    method, uri, fields, headers, options.update({
+                    method, uri, fields, headers, {
+                        **(options or {}),
                         'page': response['pagination']['current_page'] + 1
-                    }))
+                    })
                 if response['success']:
                     responseData = responseData + response['data']
 
