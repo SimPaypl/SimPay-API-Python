@@ -57,23 +57,29 @@ class SMS_Transaction(BaseModel):
     """SMS transaction model
 
     :param id: str
-        ID of SMS transaction, short UUID
+        ID of SMS transaction; the API sends a number
     :param from_number: int
         Origin number of sender, origin from api it's 'from'
-    :param code: str
-        SMS code
+    :param code: str | None
+        SMS code, None when no code was sent back
     :param used: bool
         Determinate if code has been used
+    :param send_number: int | None
+        Number the SMS was sent to, only in get_transaction
+    :param value: float | None
+        Net value of the number, only in get_transaction
     :param send_at: datetime
         Sended at
     """
     id: str
     from_number: int = Field(alias='from')
-    code: str
+    code: str | None = None
     used: bool
+    send_number: int | None = None
+    value: float | None = None
     send_at: datetime
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, coerce_numbers_to_str=True)
 
 
 class SMS_Number(BaseModel):
