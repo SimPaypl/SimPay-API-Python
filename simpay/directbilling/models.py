@@ -6,9 +6,13 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class DCB_Service_Status(Enum):
     NEW = 'service_db_new'
-    ACTIVE = 'service_db_active'
-    BLOCKED = 'service_db_rejected'
-    DELETED = 'service_db_ongoing_registration'
+    ACTIVE = 'service_active'
+    BLOCKED = 'service_db_blocked'
+    DELETED = 'service_db_deleted'
+    SECOND_VERIFY = 'service_db_second_verify'
+    REJECTED = 'service_db_rejected'
+    VERIFY = 'service_verify'
+    ONGOING_REGISTRATION = 'service_db_ongoing_registration'
 
 
 class DCB_Transaction_Status(Enum):
@@ -169,7 +173,8 @@ class DCB_Service(BaseModel):
     :param status: DCB_Service_Status
         Status
     :param api: DCB_Service_API
-        API endpoints
+        API endpoints. The service list does not include api, providers,
+        commissions and maxValues; only get_service returns them.
     :param providers: DCB_Service_Providers
         Available providers
     :param commissions: DCB_Service_Commissions
@@ -183,10 +188,10 @@ class DCB_Service(BaseModel):
     name: str
     suffix: str
     status: DCB_Service_Status
-    api: DCB_Service_API
-    providers: DCB_Service_Providers
-    commissions: DCB_Service_Commissions
-    maxValues: DCB_Service_MaxValues
+    api: DCB_Service_API | None = None
+    providers: DCB_Service_Providers | None = None
+    commissions: DCB_Service_Commissions | None = None
+    maxValues: DCB_Service_MaxValues | None = None
     created_at: datetime
 
 
