@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from simpay import Client
 
 from simpay.baseModel import Response, RequestMethod
-from simpay.sms.models import SMS_Service, SMS_Transaction, SMS_Number
+from simpay.sms.models import SMS_Service, SMS_Transaction, SMS_Number, SMS_Code
 
 
 class SMSClient(object):
@@ -55,7 +55,7 @@ class SMSClient(object):
         return SMS_Number(**self._client.request(RequestMethod.GET,
                                                  f'sms/numbers/{number}')['data'])
 
-    def verify_code(self, service_id: str, code: str, number: int = None) -> SMS_Transaction:
+    def verify_code(self, service_id: str, code: str, number: int = None) -> SMS_Code:
         fields = {
             'code': code,
         }
@@ -63,5 +63,5 @@ class SMSClient(object):
         if number:
             fields['number'] = number
 
-        return SMS_Transaction(**self._client.request(RequestMethod.POST,
-                                                      f'sms/{service_id}', fields)['data'])
+        return SMS_Code(**self._client.request(RequestMethod.POST,
+                                               f'sms/{service_id}', fields)['data'])

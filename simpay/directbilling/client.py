@@ -40,11 +40,11 @@ class DirectBillingClient(object):
         return DCB_Transaction(**self._client.request(RequestMethod.GET,
                                                       f'directbilling/{service_id}/transactions/{transaction_id}')['data'])
 
-    def get_calculate(self, service_id: str, amount: float) -> list[DCB_Service_CalculatedCommissions]:
-        return DCB_Transaction(**self._client.request(RequestMethod.GET,
-                                                      f'directbilling/{service_id}/calculate/', options={
-                                                          'amount': amount
-                                                      })['data'])
+    def get_calculate(self, service_id: str, amount: float) -> DCB_Service_CalculatedCommissions:
+        return DCB_Service_CalculatedCommissions(**self._client.request(RequestMethod.GET,
+                                                                        f'directbilling/{service_id}/calculate', options={
+                                                                            'amount': amount
+                                                                        })['data'])
 
     def generate_transaction(self, service_id: str, hash: str, amount: float, amountType: DCB_Amount_Type = None, control: str = None, description: str = None, returns: DCB_Transaction_Returns = None, phoneNumber: str = None, steamid: str = None) -> DCB_GeneratedTransaction:
         if not amountType:
@@ -61,8 +61,8 @@ class DirectBillingClient(object):
             fields['control'] = control
             signatureBuffer += control + '|'
         if returns:
-            fields['returns'] = returns
-            signatureBuffer += returns + '|'
+            fields['returns'] = {'success': returns.complete, 'failure': returns.failure}
+            signatureBuffer += returns.complete + '|' + returns.failure + '|'
         if phoneNumber:
             fields['phoneNumber'] = phoneNumber
             signatureBuffer += phoneNumber + '|'

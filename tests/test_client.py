@@ -4,7 +4,7 @@ import pytest
 import requests
 
 from simpay import Client, ClientException
-from simpay.directbilling.models import DCB_Amount_Type
+from simpay.directbilling.models import DCB_Amount_Type, DCB_Transaction_Returns, DCB_Transaction_Status
 
 
 def make_response(status_code, body):
@@ -116,6 +116,119 @@ def test_generate_transaction_signs_the_request():
         'signature': 'da558ab7a38cf6755be430946e3c6fe348c69d6d870fedb98494742458133eb9',
     }
 
+
+
+def test_generate_transaction_sends_return_urls_as_success_and_failure():
+    client, fake = client_with(make_response(200, {
+        'success': True,
+        'data': {'transactionId': 't1', 'redirectUrl': 'https://db.simpay.pl/t1'},
+    }))
+
+    client.DirectBilling.generate_transaction(
+        'svc', 'secret-hash', 10,
+        returns=DCB_Transaction_Returns(complete='https://shop.example/ok', failure='https://shop.example/fail'))
+
+    assert fake.calls[0]['json']['returns'] == {
+        'success': 'https://shop.example/ok',
+        'failure': 'https://shop.example/fail',
+    }
+
+
+# Response bodies below follow the resources and controllers in simpay-api.
+
+def test_verify_code_parses_an_unused_code():
+    client, fake = client_with(make_response(200, {'success': True, 'data': {
+        'used': False, 'code': 'ABC123', 'test': False, 'from': '48123456789', 'number': 7136, 'value': 0.5,
+    }}))
+
+    code = client.SMS.verify_code('svc', 'ABC123', 7136)
+
+    assert fake.calls[0]['url'] == 'https://api.simpay.pl/sms/svc'
+    assert fake.calls[0]['json'] == {'code': 'ABC123', 'number': 7136}
+    assert code.used is False
+    assert code.from_number == '48123456789'
+    assert code.number == 7136
+    assert code.used_at is None
+
+
+def test_verify_code_parses_an_already_used_code():
+    client, _ = client_with(make_response(200, {'success': True, 'data': {
+        'used': True, 'code': 'ABC123', 'test': True, 'from': '48123456789', 'number': 7136, 'value': 0.5,
+        'used_at': '2026-11-22T10:00:00.000000Z',
+    }}))
+
+    code = client.SMS.verify_code('svc', 'ABC123')
+
+    assert code.used is True
+    assert code.test is True
+    assert code.used_at.isoformat() == '2026-11-22T10:00:00+00:00'
+
+
+def test_get_calculate_parses_amounts_per_operator():
+    client, fake = client_with(make_response(200, {'success': True, 'data': {
+        'orange': {'net': 4.07, 'gross': 5.01},
+        'play': None,
+        't-mobile': {'net': 4.5, 'gross': 5.54},
+        'plus': None,
+    }}))
+
+    result = client.DirectBilling.get_calculate('svc', 2.5)
+
+    assert fake.calls[0]['url'] == 'https://api.simpay.pl/directbilling/svc/calculate'
+    assert fake.calls[0]['params'] == {'amount': 2.5}
+    assert result.orange.gross == 5.01
+    assert result.tmobile.net == 4.5
+    assert result.play is None
+
+
+def test_get_transaction_parses_directbilling_transaction():
+    client, _ = client_with(make_response(200, {'success': True, 'data': {
+        'id': 'tx-1',
+        'status': 'transaction_db_payed',
+        'phoneNumber': '48123456789',
+        'control': 'order-15',
+        'value': 12.3,
+        'value_net': 10,
+        'value_created': 10,
+        'value_created_type': 'NET',
+        'operator': 't-mobile',
+        'notify': {'is_send': True, 'last_send_at': '2026-11-22T10:00:00.000000Z', 'count': None},
+        'score': None,
+        'created_at': '2026-11-22T09:59:00.000000Z',
+        'updated_at': '2026-11-22T10:00:00.000000Z',
+    }}))
+
+    transaction = client.DirectBilling.get_transaction('svc', 'tx-1')
+
+    assert transaction.status == DCB_Transaction_Status.PAYED
+    assert transaction.phoneNumber == '48123456789'
+    assert transaction.value_netto == 10
+    assert transaction.operator == 't-mobile'
+    assert transaction.notify.is_send is True
+
+
+def test_get_service_parses_operator_keys_and_numeric_commissions():
+    client, _ = client_with(make_response(200, {'success': True, 'data': {
+        'id': 'svc', 'name': 'Sklep', 'suffix': 'SKLEP', 'status': 'service_db_active',
+        'api': {'complete': 'https://shop.example/ok', 'failure': 'https://shop.example/fail'},
+        'providers': {'t-mobile': True, 'orange': True, 'play': False, 'plus': True},
+        'commissions': {
+            't-mobile': {'commission_0': 45, 'commission_9': 60, 'commission_25': 70},
+            'orange': {'commission_0': 45, 'commission_9': 60, 'commission_25': 70},
+            'play': {'commission_0': None, 'commission_9': None, 'commission_25': None},
+            'plus': {'commission_0': 45, 'commission_9': 60, 'commission_25': 70},
+        },
+        'maxValues': {'t-mobile': 500, 'orange': 500, 'play': None, 'plus': 500},
+        'created_at': '2026-01-01T00:00:00.000000Z',
+    }}))
+
+    service = client.DirectBilling.get_service('svc')
+
+    assert service.providers.tmobile is True
+    assert service.providers.play is False
+    assert service.commissions.tmobile.commission_9 == '60'
+    assert service.commissions.play.commission_0 is None
+    assert service.maxValues.tmobile == '500'
 
 def notification(signature):
     return {
